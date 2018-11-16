@@ -11,19 +11,19 @@ export default {
   props: {
     id: {
       required: true,
-      type: String
+      type: String,
     },
     name: {
       required: true,
-      type: String
+      type: String,
     },
     players: {
       required: true,
-      type: Array
+      type: Array,
     },
     isPlaying: {
       required: true,
-      type: Boolean
+      type: Boolean,
     }
   },
   computed: {

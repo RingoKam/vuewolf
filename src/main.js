@@ -4,17 +4,19 @@ import Vue from "vue";
 import App from "./App";
 import router from "./router";
 import VueApollo from "vue-apollo";
-import ApolloClient from "apollo-boost";
+import ApolloClient from "apollo-client";
+import { InMemoryCache } from 'apollo-cache-inmemory'
+
 
 import { HttpLink } from "apollo-link-http";
 import { split } from "apollo-link";
 import { WebSocketLink } from "apollo-link-ws";
 import { getMainDefinition } from "apollo-utilities";
 
-const wsUrl = "wss://wo47rxljmk.sse.codesandbox.io/graphql";
+const wsUrl = "ws://localhost:4000/graphql";
 
 const httpLink = new HttpLink({
-  uri: "https://wo47rxljmk.sse.codesandbox.io/"
+  uri: "http://localhost:4000/graphql"
 });
 
 const wsLink = new WebSocketLink({
@@ -37,7 +39,9 @@ const link = split(
 //setup Apollo Client
 
 const apolloClient = new ApolloClient({
-  link
+  link,
+  cache: new InMemoryCache(),
+  connectToDevTools: true,
 });
 
 const apolloProvider = new VueApollo({

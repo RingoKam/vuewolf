@@ -16,60 +16,93 @@ import gql from "graphql-tag";
 import LobbyRoomItem from "./LobbyRoomItem.vue";
 
 export default {
-  mounted() {
-    const player = window.localStorage.getItem("player");
-    if (!!player) {
-      this.player = JSON.parse(player);
-    } else {
-      this.$router.push({ name: "CreateUser" });
-    }
-  },
-  data: () => ({
-    player: {},
-    newRoomName: ""
-  }),
-  apollo: {
-    getRoom: gql`
-      query {
-        getRoom {
-          id
-          name
-          isPlaying
+    mounted() {
+        const player = window.localStorage.getItem("player");
+        if (!!player) {
+            this.player = JSON.parse(player);
+        } else {
+            this.$router.push({ name: "CreateUser" });
         }
-      }
-    `
-  },
-  components: { LobbyRoomItem },
-  methods: {
-    async newRoom(roomName) {
-      const { data } = await this.$apollo.mutate({
-        mutation: gql`
-          mutation($roomName: String!, $playerId: ID!) {
-            newRoom(roomName: $roomName, playerId: $playerId)
-          }
-        `,
-        variables: {
-          roomName: roomName,
-          playerId: this.player.id
-        }
-      });
-      this.$router.push({ name: "Room", params: { roomId: data.newRoom } });
     },
-    async joinGame(id) {
-      const { data } = await this.$apollo.mutate({
-        mutation: gql`
-          mutation($roomId: ID!, $playerId: ID!) {
-            joinRoom(roomId: $roomId, playerId: $playerId)
-          }
-        `,
-        variables: {
-          roomId: id,
-          playerId: this.player.id
+    data: () => ({
+        player: {},
+        newRoomName: ""
+    }),
+    apollo: {
+        getRoom: {
+            query: gql`
+                query {
+                    getRoom {
+                        id
+                        name
+                        isPlaying
+                        players {
+                            id
+                            name
+                        }
+                    }
+                }
+            `,
+            subscribeToMore: {
+                document: gql`
+                    subscription {
+                        updateRoom {
+                            id
+                            name
+                            players {
+                              id
+                              name
+                            }
+                            isPlaying
+                        }
+                    }
+                `,
+                updateQuery: ({ getRoom }, { subscriptionData }) => {
+                  const updatedRoom = subscriptionData.data.updateRoom;       
+                  const roomIndex = getRoom.findIndex(room => room.id === updatedRoomId)
+                  getRoom[roomIndex] = updatedRoom;
+                  return getRoom;
+                }
+            }
         }
-      });
-      this.$router.push({ name: "Room", params: { roomId: data.joinRoom } });
+    },
+    components: { LobbyRoomItem },
+    methods: {
+        async newRoom(roomName) {
+            const { data } = await this.$apollo.mutate({
+                mutation: gql`
+                    mutation($roomName: String!, $playerId: ID!) {
+                        newRoom(roomName: $roomName, playerId: $playerId)
+                    }
+                `,
+                variables: {
+                    roomName: roomName,
+                    playerId: this.player.id
+                }
+            });
+            this.$router.push({
+                name: "Room",
+                params: { roomId: data.newRoom }
+            });
+        },
+        async joinGame(id) {
+            const { data } = await this.$apollo.mutate({
+                mutation: gql`
+                    mutation($roomId: ID!, $playerId: ID!) {
+                        joinRoom(roomId: $roomId, playerId: $playerId)
+                    }
+                `,
+                variables: {
+                    roomId: id,
+                    playerId: this.player.id
+                }
+            });
+            this.$router.push({
+                name: "Room",
+                params: { roomId: data.joinRoom }
+            });
+        }
     }
-  }
 };
 </script>
 
