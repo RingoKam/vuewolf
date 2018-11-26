@@ -1,27 +1,8 @@
-# test-project
+# Vuewolf
+Browser CLient for Werewolf game. Each client represent a player. 
 
-> A Vue.js project
-
-## Build Setup
-
-``` bash
-# install dependencies
-npm install
-
-# serve with hot reload at localhost:8080
-npm run dev
-
-# build for production with minification
-npm run build
-
-# build for production and view the bundle analyzer report
-npm run build --report
-
-# run unit tests
-npm run unit
-
-# run all tests
-npm test
-```
-
-For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
+## Struggles/Concern
+1. Graphql on component doesnt look that clean
+2. need unit test
+3. need e2e test
+4. not sure how to do subscription

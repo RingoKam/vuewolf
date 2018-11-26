@@ -14,12 +14,15 @@
 <script>
 import gql from "graphql-tag";
 import LobbyRoomItem from "./LobbyRoomItem.vue";
+import errorHandler from "../util/ErrorHandling";
+import { validatePlayerModel } from "../util/ValidateModel";
 
 export default {
     mounted() {
         const player = window.localStorage.getItem("player");
         if (!!player) {
-            this.player = JSON.parse(player);
+            const p = JSON.parse(player);
+            this.player = validatePlayerModel(p);
         } else {
             this.$router.push({ name: "CreateUser" });
         }
@@ -50,18 +53,20 @@ export default {
                             id
                             name
                             players {
-                              id
-                              name
+                                id
+                                name
                             }
                             isPlaying
                         }
                     }
                 `,
                 updateQuery: ({ getRoom }, { subscriptionData }) => {
-                  const updatedRoom = subscriptionData.data.updateRoom;       
-                  const roomIndex = getRoom.findIndex(room => room.id === updatedRoomId)
-                  getRoom[roomIndex] = updatedRoom;
-                  return getRoom;
+                    const updatedRoom = subscriptionData.data.updateRoom;
+                    const roomIndex = getRoom.findIndex(
+                        room => room.id === updatedRoom.Id
+                    );
+                    getRoom[roomIndex] = updatedRoom;
+                    return getRoom;
                 }
             }
         }
@@ -71,13 +76,13 @@ export default {
         async newRoom(roomName) {
             const { data } = await this.$apollo.mutate({
                 mutation: gql`
-                    mutation($roomName: String!, $playerId: ID!) {
-                        newRoom(roomName: $roomName, playerId: $playerId)
+                    mutation($roomName: String!, $player: JoinedPlayer!) {
+                        newRoom(roomName: $roomName, player: $player)
                     }
                 `,
                 variables: {
                     roomName: roomName,
-                    playerId: this.player.id
+                    player: this.player
                 }
             });
             this.$router.push({
@@ -88,13 +93,13 @@ export default {
         async joinGame(id) {
             const { data } = await this.$apollo.mutate({
                 mutation: gql`
-                    mutation($roomId: ID!, $playerId: ID!) {
-                        joinRoom(roomId: $roomId, playerId: $playerId)
+                    mutation($roomId: ID!, $player: JoinedPlayer!) {
+                        joinRoom(roomId: $roomId, player: $player)
                     }
                 `,
                 variables: {
                     roomId: id,
-                    playerId: this.player.id
+                    player: this.player
                 }
             });
             this.$router.push({
