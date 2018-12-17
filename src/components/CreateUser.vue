@@ -1,8 +1,8 @@
 <template>
   <div class="create-user">
     <label for="username">Username</label>
-    <input v-model="username" type="text" />
-    <button name="username" @click="addPlayer(username);">Let's go!</button>
+    <input data-cy="username-input" v-model="username" type="text" />
+    <button data-cy="username-submit" name="username" @click="addPlayer(username);">Let's go!</button>
   </div>
 </template>
 
@@ -14,7 +14,7 @@ export default {
   created() {
     //check see if user is created, if so, go to lobby
     const player = window.localStorage.getItem("player");
-    if (!!player) {
+    if (player) {
       this.$router.push({ name: "Lobby" });
     }
   },
