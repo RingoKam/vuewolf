@@ -65,7 +65,11 @@ export default {
                     const roomIndex = getRoom.findIndex(
                         room => room.id === updatedRoom.Id
                     );
-                    getRoom[roomIndex] = updatedRoom;
+                    if(roomIndex === -1) {
+                        getRoom.push(updatedRoom);
+                    } else {
+                        getRoom[roomIndex] = updatedRoom;
+                    }
                     return getRoom;
                 }
             }
